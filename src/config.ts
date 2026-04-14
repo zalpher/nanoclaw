@@ -10,6 +10,9 @@ const envConfig = readEnvFile([
   'ASSISTANT_HAS_OWN_NUMBER',
   'ONECLI_URL',
   'TZ',
+  'ANTHROPIC_BASE_URL',
+  'ANTHROPIC_AUTH_TOKEN',
+  'ANTHROPIC_API_KEY',
 ]);
 
 export const ASSISTANT_NAME =
@@ -94,3 +97,11 @@ function resolveConfigTimezone(): string {
   return 'UTC';
 }
 export const TIMEZONE = resolveConfigTimezone();
+
+// Gateway credentials — passed through to containers when OneCLI is not available.
+export const ANTHROPIC_BASE_URL =
+  process.env.ANTHROPIC_BASE_URL || envConfig.ANTHROPIC_BASE_URL;
+export const ANTHROPIC_AUTH_TOKEN =
+  process.env.ANTHROPIC_AUTH_TOKEN || envConfig.ANTHROPIC_AUTH_TOKEN;
+export const ANTHROPIC_API_KEY =
+  process.env.ANTHROPIC_API_KEY || envConfig.ANTHROPIC_API_KEY;

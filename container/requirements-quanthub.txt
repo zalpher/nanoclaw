@@ -1,0 +1,13 @@
+zipline-reloaded>=3.1.1
+skfolio>=0.10.0
+pandas>=2.0.0
+numpy>=1.24.0
+loguru>=0.7.0
+pydantic-settings>=2.0.0
+empyrical>=0.5.0
+alphalens-reloaded>=0.4.0
+duckdb>=1.0.0
+scipy>=1.10.0
+scikit-learn>=1.0.0
+optuna>=4.0.0
+matplotlib>=3.5.0

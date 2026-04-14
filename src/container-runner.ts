@@ -15,6 +15,9 @@ import {
   IDLE_TIMEOUT,
   ONECLI_URL,
   TIMEZONE,
+  ANTHROPIC_BASE_URL,
+  ANTHROPIC_AUTH_TOKEN,
+  ANTHROPIC_API_KEY,
 } from './config.js';
 import { resolveGroupFolderPath, resolveGroupIpcPath } from './group-folder.js';
 import { logger } from './logger.js';
@@ -260,11 +263,34 @@ async function buildContainerArgs(
   });
   if (onecliApplied) {
     logger.info({ containerName }, 'OneCLI gateway config applied');
+    // If a custom base URL is configured, override the destination even when OneCLI
+    // is handling credential injection — OneCLI proxies api.anthropic.com by default
+    // but our gateway lives at a different host.
+    if (ANTHROPIC_BASE_URL) {
+      args.push('-e', `ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}`);
+    }
+    if (ANTHROPIC_AUTH_TOKEN) {
+      args.push('-e', `ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN}`);
+    }
   } else {
-    logger.warn(
-      { containerName },
-      'OneCLI gateway not reachable — container will have no credentials',
-    );
+    // Fallback: pass through gateway credentials from host environment directly.
+    if (ANTHROPIC_BASE_URL) {
+      args.push('-e', `ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}`);
+    }
+    if (ANTHROPIC_AUTH_TOKEN) {
+      args.push('-e', `ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN}`);
+    }
+    if (ANTHROPIC_API_KEY) {
+      args.push('-e', `ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}`);
+    }
+    if (ANTHROPIC_BASE_URL || ANTHROPIC_AUTH_TOKEN || ANTHROPIC_API_KEY) {
+      logger.info({ containerName }, 'Using host gateway credentials (OneCLI not available)');
+    } else {
+      logger.warn(
+        { containerName },
+        'OneCLI gateway not reachable — container will have no credentials',
+      );
+    }
   }
 
   // Runtime-specific args for host gateway resolution
